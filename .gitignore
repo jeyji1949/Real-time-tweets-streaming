@@ -1,0 +1,24 @@
+`
+
+**Contenu minimal :**
+```
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Secrets
+.env
+*.env
+producer/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+
+# IDE
+.vscode/
+.idea/
+*.swp
