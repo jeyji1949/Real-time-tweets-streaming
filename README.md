@@ -229,6 +229,11 @@ curl http://localhost:9200
 
 ---
 
+## Collaboration rules
+- Do NOT push to main
+- Work only on your branch
+- Use Pull Requests for merging
+
 ## 📄 Licence
 
 Ce projet est à usage éducatif dans le cadre du cours de Big Data.
