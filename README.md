@@ -228,6 +228,93 @@ curl http://localhost:9200
 - **Personne 3** - Cassandra & Kibana Dashboards
 
 ---
+## ✅ État d'avancement - Personne 1 (Kafka Pipeline)
+
+### Infrastructure ✅ TERMINÉ
+- [x] Docker Compose configuré avec 5 services
+- [x] Kafka + Zookeeper opérationnels
+- [x] Topic `tweets_raw` créé automatiquement
+- [x] Configuration réseau corrigée (ADVERTISED_LISTENERS)
+
+### Code ✅ TERMINÉ
+- [x] Simulateur de tweets réaliste (`producer/twitter_simulator.py`)
+- [x] Consumer Kafka fonctionnel (`consumer/consumer.py`)
+- [x] Tests de validation (`test_simple_producer.py`)
+- [x] Scripts de démarrage automatique
+
+### Documentation ✅ TERMINÉ
+- [x] Guide d'installation complet (`docs/01-setup-guide.md`)
+- [x] Guide de démonstration (`docs/02-demo.md`)
+- [x] Guide de dépannage (`docs/03-troubleshooting.md`)
+- [x] Architecture du système (`docs/04-architecture.md`)
+- [x] Schéma JSON standardisé (`docs/schema.json`)
+
+### Pipeline ✅ OPÉRATIONNEL
+```
+Simulator → Kafka (tweets_raw) → Consumer
+  (1-3s)       (<100ms)            (real-time)
+```
+
+---
+
+## 📊 Démonstration rapide
+
+### Lancer le pipeline
+
+**Terminal 1 - Consumer :**
+```bash
+source venv/bin/activate
+cd consumer && python consumer.py
+```
+
+**Terminal 2 - Producer :**
+```bash
+source venv/bin/activate
+cd producer && python twitter_simulator.py
+```
+
+### Résultat attendu
+
+Les tweets générés par le producer apparaissent instantanément dans le consumer ! 🎉
+
+---
+
+## 🤝 Pour Personne 2 (OpenAI + Elasticsearch)
+
+**Le pipeline Kafka est prêt !**
+
+**Ce qui fonctionne :**
+- ✅ Kafka sur `localhost:9092`
+- ✅ Topic : `tweets_raw`
+- ✅ Format : JSON (voir `docs/schema.json`)
+- ✅ ~20 tweets/minute
+
+**Pour démarrer :**
+1. Lire le guide : `docs/01-setup-guide.md`
+2. Voir le format : `docs/schema.json`
+3. Se connecter à Kafka :
+```python
+from kafka import KafkaConsumer
+consumer = KafkaConsumer('tweets_raw', bootstrap_servers='localhost:9092')
+```
+
+**Prochaines étapes :**
+1. Analyser chaque tweet avec OpenAI
+2. Ajouter les champs : `sentiment`, `topic`, `confidence`
+3. Indexer dans Elasticsearch
+
+---
+
+## 📚 Documentation complète
+
+Toute la documentation se trouve dans `/docs` :
+- **Setup** : [01-setup-guide.md](docs/01-setup-guide.md)
+- **Démo** : [02-demo.md](docs/02-demo.md)
+- **Troubleshooting** : [03-troubleshooting.md](docs/03-troubleshooting.md)
+- **Architecture** : [04-architecture.md](docs/04-architecture.md)
+- **Schema** : [schema.json](docs/schema.json)
+```
+---
 
 ## Collaboration rules
 - Do NOT push to main
