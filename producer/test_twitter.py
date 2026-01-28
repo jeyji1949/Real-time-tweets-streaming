@@ -1,34 +1,56 @@
-	import tweepy
-import os
-from dotenv import load_dotenv
+#!/usr/bin/env python3
+from kafka import KafkaProducer
+import json
+import time
+from datetime import datetime
 
-load_dotenv()
+print("=" * 80)
+print("🧪 TEST SIMPLE PRODUCER")
+print("=" * 80)
 
-BEARER_TOKEN = os.getenv('TWITTER_BEARER_TOKEN')
+BROKER = 'localhost:9092'
+TOPIC = 'tweets_raw'
 
-if not BEARER_TOKEN:
-    print("❌ Bearer Token manquant !")
-    exit(1)
+print(f"\n📡 Broker: {BROKER}")
+print(f"📮 Topic: {TOPIC}")
+print("\n🔄 Création du producer...\n")
 
 try:
-    client = tweepy.Client(bearer_token=BEARER_TOKEN)
-    
-    # Test simple : chercher des tweets récents
-    response = client.search_recent_tweets(
-        query="python",
-        max_results=10
+    producer = KafkaProducer(
+        bootstrap_servers=BROKER,
+        value_serializer=lambda v: json.dumps(v).encode('utf-8'),
+        acks=1,
+       # max_block_ms=60000
     )
+    print("✅ Producer créé avec succès !\n")
     
-    if response.data:
-        print(f"✅ Connexion Twitter réussie !")
-        print(f"   {len(response.data)} tweets trouvés")
-        print(f"\n📝 Exemple de tweet:")
-        print(f"   {response.data[0].text[:100]}...")
-    else:
-        print("⚠️  Connexion OK mais aucun tweet trouvé")
+    # Envoyer 3 messages de test
+    for i in range(1, 4):
+        tweet = {
+            "tweet_id": str(1000 + i),
+            "text": f"Message de test numero {i}",
+            "created_at": datetime.now().isoformat(),
+            "user": "test_user",
+            "lang": "fr",
+            "hashtags": ["test"]
+        }
         
-except tweepy.errors.Unauthorized:
-    print("❌ Erreur d'authentification !")
-    print("➡️  Vérifiez votre Bearer Token")
+        print(f"📤 Envoi du message {i}...")
+        future = producer.send(TOPIC, value=tweet)
+        
+        # Attendre confirmation
+        record = future.get(timeout=10)
+        print(f"   ✅ Confirmé - Partition: {record.partition}, Offset: {record.offset}")
+        
+        time.sleep(1)
+    
+    producer.flush()
+    producer.close()
+    print("\n✅ Test réussi ! Tous les messages envoyés.\n")
+    print("=" * 80)
+    
 except Exception as e:
-    print(f"❌ Erreur: {e}")
+    print(f"\n❌ ERREUR: {e}\n")
+    print(f"Type: {type(e).__name__}")
+    import traceback
+    traceback.print_exc()
