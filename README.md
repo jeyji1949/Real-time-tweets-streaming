@@ -34,7 +34,7 @@ Analyser des tweets en temps réel pour extraire :
 [Kibana] (visualisation + dashboards)
 ```
 
-**Schéma détaillé :** Voir [docs/architecture.md](docs/architecture.md)
+**Schéma détaillé :** Voir [docs/04-architecture.md](docs/architecture.md)
 
 ---
 
@@ -313,7 +313,7 @@ Toute la documentation se trouve dans `/docs` :
 - **Troubleshooting** : [03-troubleshooting.md](docs/03-troubleshooting.md)
 - **Architecture** : [04-architecture.md](docs/04-architecture.md)
 - **Schema** : [schema.json](docs/schema.json)
-```
+  
 ---
 
 ## Collaboration rules
