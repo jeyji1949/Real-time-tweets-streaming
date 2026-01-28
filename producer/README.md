@@ -1,35 +1,12 @@
 # 📤 Twitter Stream Producer
 
-Producer Kafka qui collecte les tweets en temps réel depuis l'API Twitter.
-
+Producer Kafka qui collecte les tweets en temps réel depuis un simulateur 
 ## 🎯 Responsabilité
 
 Streamer les tweets depuis Twitter vers le topic Kafka `tweets_raw`.
 
 ---
 
-## 🔧 Configuration
-
-### 1. Créer le fichier `.env`
-```bash
-cp .env.example .env
-nano .env
-```
-
-Remplir avec vos clés Twitter (obtenues sur [developer.twitter.com](https://developer.twitter.com)).
-
-### 2. Modifier les règles de filtrage
-
-Éditer `twitter_stream_producer.py`, ligne ~95 :
-```python
-rules = [
-    tweepy.StreamRule("python OR programming lang:en"),
-    tweepy.StreamRule("AI OR MachineLearning lang:en"),
-    # Ajoutez vos propres règles ici
-]
-```
-
----
 
 ## 🚀 Utilisation
 ```bash
@@ -67,17 +44,12 @@ Voir le schéma complet : [docs/schema.json](../docs/schema.json)
 # Tester la connexion Twitter
 python test_twitter.py
 
-# Tester l'envoi vers Kafka
-python test_kafka_producer.py
 ```
 
 ---
 
 ## 🐛 Dépannage
 
-### Erreur 401 (Unauthorized)
-- Vérifier le Bearer Token dans `.env`
-- Régénérer le token si nécessaire
 
 ### Erreur 429 (Too Many Requests)
 - Rate limit atteint, attendre 15 minutes

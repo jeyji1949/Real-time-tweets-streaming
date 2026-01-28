@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Twitter Tweet Schema",
+  "description": "Format standardisé des tweets dans le pipeline d'analyse temps réel",
+  "version": "1.0",
+  "type": "object",
+  
+  "required": ["tweet_id", "text", "created_at", "user", "lang", "hashtags"],
+  
+  "properties": {
+    "tweet_id": {
+      "type": "string",
+      "description": "Identifiant unique du tweet",
+      "pattern": "^[0-9]+$",
+      "minLength": 1,
+      "examples": ["1000000", "1234567890"]
+    },
+    
+    "text": {
+      "type": "string",
+      "description": "Contenu textuel complet du tweet",
+      "minLength": 1,
+      "maxLength": 500,
+      "examples": [
+        "Just finished building a machine learning project! #Python #AI",
+        "Amazing tutorial on neural networks! #MachineLearning #DeepLearning"
+      ]
+    },
+    
+    "created_at": {
+      "type": "string",
+      "description": "Date et heure de création du tweet au format ISO 8601",
+      "format": "date-time",
+      "examples": [
+        "2026-01-26T23:30:00",
+        "2026-01-26T23:30:00.000Z"
+      ]
+    },
+    
+    "user": {
+      "type": "string",
+      "description": "Nom d'utilisateur ou identifiant de l'auteur",
+      "minLength": 1,
+      "examples": ["python_dev", "ai_researcher", "tech_enthusiast"]
+    },
+    
+    "lang": {
+      "type": "string",
+      "description": "Code langue ISO 639-1 (2 lettres)",
+      "pattern": "^[a-z]{2}$",
+      "examples": ["en", "fr", "es", "de"]
+    },
+    
+    "hashtags": {
+      "type": "array",
+      "description": "Liste des hashtags présents dans le tweet (sans le symbole #)",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_]+$"
+      },
+      "uniqueItems": true,
+      "examples": [
+        ["Python", "MachineLearning"],
+        ["AI", "DeepLearning", "NeuralNetworks"],
+        []
+      ]
+    },
+    
+    "retweet_count": {
+      "type": "integer",
+      "description": "Nombre de retweets (partages) du tweet",
+      "minimum": 0,
+      "examples": [0, 42, 156, 1250]
+    },
+    
+    "like_count": {
+      "type": "integer",
+      "description": "Nombre de likes (j'aime) du tweet",
+      "minimum": 0,
+      "examples": [0, 23, 342, 5000]
+    },
+    
+    "sentiment": {
+      "type": "string",
+      "description": "Sentiment analysé par OpenAI (ajouté par Personne 2)",
+      "enum": ["positive", "negative", "neutral"],
+      "examples": ["positive", "negative", "neutral"]
+    },
+    
+    "topic": {
+      "type": "string",
+      "description": "Topic principal extrait par OpenAI (ajouté par Personne 2)",
+      "examples": ["Machine Learning", "Data Science", "Cloud Computing"]
+    },
+    
+    "confidence": {
+      "type": "number",
+      "description": "Score de confiance de l'analyse OpenAI (0-1)",
+      "minimum": 0,
+      "maximum": 1,
+      "examples": [0.95, 0.87, 0.72]
+    }
+  },
+  
+  "examples": [
+    {
+      "tweet_id": "1000000",
+      "text": "Just finished building a machine learning project! Learned so much about neural networks. #Python #MachineLearning #AI",
+      "created_at": "2026-01-26T23:30:00.000Z",
+      "user": "python_dev",
+      "lang": "en",
+      "hashtags": ["Python", "MachineLearning", "AI"],
+      "retweet_count": 42,
+      "like_count": 156,
+      "sentiment": "positive",
+      "topic": "Machine Learning",
+      "confidence": 0.95
+    },
+    {
+      "tweet_id": "1000001",
+      "text": "Struggling with async programming in Python today... Any recommendations? #Python #Programming",
+      "created_at": "2026-01-26T23:32:15.000Z",
+      "user": "code_lover",
+      "lang": "en",
+      "hashtags": ["Python", "Programming"],
+      "retweet_count": 8,
+      "like_count": 23,
+      "sentiment": "negative",
+      "topic": "Programming",
+      "confidence": 0.82
+    },
+    {
+      "tweet_id": "1000002",
+      "text": "New article on cloud architecture patterns. #Cloud #DevOps #AWS",
+      "created_at": "2026-01-26T23:34:42.000Z",
+      "user": "tech_guru",
+      "lang": "en",
+      "hashtags": ["Cloud", "DevOps", "AWS"],
+      "retweet_count": 67,
+      "like_count": 234,
+      "sentiment": "neutral",
+      "topic": "Cloud Computing",
+      "confidence": 0.91
+    }
+  ],
+  
+  "notes": {
+    "personne_1": "Génère les champs: tweet_id, text, created_at, user, lang, hashtags, retweet_count, like_count",
+    "personne_2": "Ajoute les champs: sentiment, topic, confidence",
+    "personne_3": "Utilise tous les champs pour visualisation et stockage"
+  }
+}
