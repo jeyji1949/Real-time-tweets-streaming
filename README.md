@@ -166,9 +166,9 @@ CASSANDRA_HOST=localhost:9042
 
 ## 📚 Documentation
 
-- [Architecture détaillée](docs/architecture.md)
+- [Architecture détaillée](docs/04-architecture.md)
 - [Schéma JSON](docs/schema.json)
-- [Guide de setup complet](docs/setup-guide.md)
+- [Guide de setup complet](docs/01-setup-guide.md)
 - [Producer README](producer/README.md)
 - [Consumer README](consumer/README.md)
 - [Analysis README](analysis/README.md)
