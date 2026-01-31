@@ -1,14 +1,30 @@
+#!/usr/bin/env python3
+"""
+Test de configuration - Vérification des variables Kafka
+"""
+
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv(dotenv_path='../.env')
 
-bearer = os.getenv('TWITTER_BEARER_TOKEN')
+print("🔍 Vérification de la configuration")
+print("=" * 50)
 
-if bearer:
-    print("✅ Bearer Token chargé !")
-    print(f"   Longueur: {len(bearer)} caractères")
-    print(f"   Début: {bearer[:20]}...")
+# Kafka
+kafka_broker = os.getenv('KAFKA_BROKER')
+kafka_topic = os.getenv('KAFKA_TOPIC')
+
+if kafka_broker:
+    print(f"✅ KAFKA_BROKER: {kafka_broker}")
 else:
-    print("❌ Bearer Token NON trouvé dans .env")
-    print("➡️  Vérifiez votre fichier .env")
+    print("❌ KAFKA_BROKER non défini")
+
+if kafka_topic:
+    print(f"✅ KAFKA_TOPIC: {kafka_topic}")
+else:
+    print("❌ KAFKA_TOPIC non défini")
+
+print("=" * 50)
+print("\n💡 Ce projet utilise un SIMULATEUR local")
+print("   Aucune clé Twitter API n'est nécessaire\n")
