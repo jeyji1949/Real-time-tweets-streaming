@@ -49,6 +49,7 @@ Analyser des tweets en temps réel pour extraire :
 ```
 
 **Schéma détaillé :** Voir [docs/04-architecture.md](docs/04-architecture.md)
+**Schéma détaillé :** Voir [docs/04-architecture.md](docs/architecture.md)
 
 ---
 
