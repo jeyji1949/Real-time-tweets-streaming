@@ -1,7 +1,19 @@
 #!/usr/bin/env python3
 """
-Twitter Simulator - Génère des tweets réalistes en temps réel
-Alternative gratuite à l'API Twitter
+🤖 SIMULATEUR LOCAL DE TWEETS (Pas d'API Twitter)
+
+Ce fichier génère des tweets synthétiques localement.
+⚠️  AUCUNE connexion à l'API Twitter
+⚠️  AUCUN Bearer Token nécessaire
+⚠️  AUCUN compte Twitter Developer requis
+
+Le simulateur crée des tweets réalistes avec :
+- Textes variés et cohérents
+- Hashtags pertinents
+- Métriques (retweets, likes)
+- Format JSON standardisé
+
+Les tweets sont envoyés directement vers Kafka.
 """
 
 from kafka import KafkaProducer
