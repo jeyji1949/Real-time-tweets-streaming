@@ -1,20 +1,31 @@
-# Stockage Permanent – Cassandra
-*(Personne 3 – Windows)*
+# 🧱 Partie 3 — Cassandra Storage & Kibana Dashboards
 
-## Objectif
+## 📌 Objectif
 
-Fournir un stockage persistant et scalable pour les tweets analysés, en complément d'Elasticsearch.  
-Cassandra est particulièrement adaptée pour :
-- Écritures massives et rapides
-- Requêtes par clé primaire (tweet_id)
-- Stockage historique longue durée
-- Haute disponibilité (si cluster plus tard)
+Cette partie assure :
 
-**Note** : Cette partie est **optionnelle** pour la démo de base, mais elle ajoute beaucoup de valeur professionnelle au projet.
+- Consommation des tweets depuis Kafka
+- Stockage en temps réel dans Apache Cassandra
+- Vérification des données
+- Préparation de la visualisation via Kibana
 
-## Prérequis
+Pipeline :
 
-- Docker Compose lancé (`docker-compose up -d`)
-- Container Cassandra UP :  
-  ```powershell
-  docker-compose ps | findstr cassandra
+Kafka → Python Consumer → Cassandra → Elasticsearch → Kibana
+
+---
+
+## 🛠 Technologies
+
+- Docker / Docker Compose
+- Apache Cassandra 4.1
+- Kafka
+- Elasticsearch
+- Kibana
+- Python 3.11
+- cassandra-driver
+
+---
+
+## 📁 Structure
+
