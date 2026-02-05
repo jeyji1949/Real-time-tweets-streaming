@@ -1,0 +1,15 @@
+{
+  "mappings": {
+    "properties": {
+      "text": { "type": "text" },
+      "sentiment": { "type": "keyword" },
+      "topic": { "type": "keyword" },
+      "summary": { "type": "text" },
+      "hashtags": { "type": "keyword" },
+      "mentions": { "type": "keyword" },
+      "word_freq": { "type": "object" },
+      "score": { "type": "integer" },
+      "created_at": { "type": "date", "ignore_malformed": true }
+    }
+  }
+}
