@@ -8,7 +8,8 @@ services:
       - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:7.7.0
@@ -25,52 +26,44 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "tweets_raw:1:1"
-        # Ajoute ça pour plus de logs si besoin
-      command: >
-        sh -c "sleep 30 && /etc/confluent/docker/run"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"       
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
     ports:
       - "9200:9200"
-      - "9300:9300"
-    volumes:
-      - esdata:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9200"]
+      interval: 10s
+      retries: 10
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.15.0
-    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:8.11.0
     depends_on:
-      - elasticsearch
+      elasticsearch:
+        condition: service_healthy
     ports:
       - "5601:5601"
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
-  cassandra:
-    image: cassandra:4.1
-    container_name: cassandra
-    ports:
-      - "9042:9042"
+  analyzer:
+    build: ./analysis/analyzer
+    container_name: analyzer
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    env_file:
+      - ./analysis/.env
     environment:
-      MAX_HEAP_SIZE: 512M
-      HEAP_NEWSIZE: 100M
-    volumes:
-      - cassandradata:/var/lib/cassandra
-    deploy:
-      resources:
-        limits:
-          memory: 2g
+      BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: tweets_raw
+      ES_HOST: http://elasticsearch:9200
 
-volumes:
-  esdata:
-  cassandradata:

@@ -7,3 +7,5 @@ python-dotenv==1.2.1
 requests==2.32.5
 requests-oauthlib==2.0.0
 urllib3==2.6.3
+textblob
+
