@@ -58,7 +58,7 @@ services:
       - "9042:9042"
   analyzer:
     build:
-      context: ./analyzer
+      context: ./analysis/analyzer
       dockerfile: Dockerfile
     container_name: analyzer
     depends_on:
