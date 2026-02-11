@@ -27,6 +27,8 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
     environment:
       - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
     ports:
       - "9200:9200"
 
@@ -41,3 +43,18 @@ services:
     image: cassandra:4.1
     ports:
       - "9042:9042"
+  analyzer:
+    build:
+      context: ./analyzer
+      dockerfile: Dockerfile
+    container_name: analyzer
+    depends_on:
+      - kafka
+      - elasticsearch
+    environment:
+      - KAFKA_BROKER=kafka:29092
+      - KAFKA_TOPIC=tweets_raw
+      - ES_HOST=elasticsearch:9200
+    networks:
+      - default
+    restart: unless-stopped
