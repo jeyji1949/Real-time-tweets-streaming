@@ -34,7 +34,7 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.http.ssl.enabled=false
     ports:
       - "9200:9200"
     healthcheck:
@@ -52,18 +52,22 @@ services:
     environment:
       ELASTICSEARCH_HOSTS: http://elasticsearch:9200
 
+  cassandra:
+    image: cassandra:4.1
+    ports:
+      - "9042:9042"
   analyzer:
-    build: ./analysis/analyzer
+    build:
+      context: ./analyzer
+      dockerfile: Dockerfile
     container_name: analyzer
     depends_on:
-      elasticsearch:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-    env_file:
-      - ./analysis/.env
+      - kafka
+      - elasticsearch
     environment:
-      BOOTSTRAP_SERVERS: kafka:29092
-      KAFKA_TOPIC: tweets_raw
-      ES_HOST: http://elasticsearch:9200
-
+      - KAFKA_BROKER=kafka:29092
+      - KAFKA_TOPIC=tweets_raw
+      - ES_HOST=elasticsearch:9200
+    networks:
+      - default
+    restart: unless-stopped
