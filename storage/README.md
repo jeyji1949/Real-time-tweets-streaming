@@ -1,31 +1,45 @@
-# 🧱 Partie 3 — Cassandra Storage & Kibana Dashboards
+# 🗃️ CASSANDRA - Stockage des Tweets
 
-## 📌 Objectif
+## 📋 Table des matières
 
-Cette partie assure :
-
-- Consommation des tweets depuis Kafka
-- Stockage en temps réel dans Apache Cassandra
-- Vérification des données
-- Préparation de la visualisation via Kibana
-
-Pipeline :
-
-Kafka → Python Consumer → Cassandra → Elasticsearch → Kibana
+1. [Vue d'ensemble](#vue-densemble)
+2. [Prérequis](#prérequis)
+3. [Installation et Configuration](#installation-et-configuration)
+4. [Schéma de données](#schéma-de-données)
+5. [Synchronisation ES → Cassandra](#synchronisation-es--cassandra)
+6. [Requêtes et Vérifications](#requêtes-et-vérifications)
+7. [Dépannage](#dépannage)
 
 ---
 
-## 🛠 Technologies
+## Vue d'ensemble
 
-- Docker / Docker Compose
-- Apache Cassandra 4.1
-- Kafka
-- Elasticsearch
-- Kibana
-- Python 3.11
-- cassandra-driver
+### 🎯 Rôle de Cassandra dans le projet
+
+[Producer] → [Kafka] → [Analyzer] → [Elasticsearch] → [Cassandra]
+↓ ↓
+Analyse temps Archivage
+réel long terme
+
+
+**Cassandra** stocke les tweets analysés pour :
+- ✅ Archivage permanent (Elasticsearch garde 7 jours)
+- ✅ Requêtes rapides par topic, sentiment, user
+- ✅ Scalabilité horizontale
 
 ---
 
-## 📁 Structure
+## Prérequis
 
+### Services Docker requis
+
+| Service | Port | Statut requis |
+|---------|------|---------------|
+| Cassandra | 9042 | Running |
+| Elasticsearch | 9200 | Running (healthy) |
+
+### Vérifier les services
+
+```powershell
+cd D:\Projets\real-time-tweets-streaming
+docker compose ps
