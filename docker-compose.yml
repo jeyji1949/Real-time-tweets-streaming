@@ -81,9 +81,3 @@ services:
 networks:
   default:
     driver: bridge
-      - KAFKA_BROKER=kafka:29092
-      - KAFKA_TOPIC=tweets_raw
-      - ES_HOST=elasticsearch:9200
-    networks:
-      - default
-    restart: unless-stopped
