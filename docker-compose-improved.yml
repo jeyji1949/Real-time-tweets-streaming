@@ -1,0 +1,199 @@
+version: '3.9'
+
+services:
+  # ==========================================================================
+  # ZOOKEEPER - Coordination Kafka
+  # ==========================================================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.7.0
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    # ✅ AMÉLIORATION : Health check
+    healthcheck:
+      test: ["CMD", "echo", "ruok", "|", "nc", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================================
+  # KAFKA - Message Broker (VERSION AMÉLIORÉE)
+  # ==========================================================================
+  kafka:
+    image: confluentinc/cp-kafka:7.7.0
+    container_name: kafka
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    ports:
+      - "9092:9092"
+      - "9101:9101"  # ✅ Port pour JMX metrics
+    environment:
+      # ========== IDENTITÉ ==========
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      
+      # ========== RÉSEAU ==========
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      
+      # ========== PARTITIONS & RÉPLICATION ==========
+      # ✅ AMÉLIORATION : 3 partitions par défaut au lieu de 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 1
+      KAFKA_MIN_INSYNC_REPLICAS: 1
+      
+      # ========== OFFSETS ==========
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      
+      # ========== RETENTION (Combien de temps garder les données) ==========
+      # ✅ AMÉLIORATION : 7 jours (168 heures)
+      KAFKA_LOG_RETENTION_HOURS: 168
+      # ✅ Taille max d'un segment (1GB)
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      # ✅ Nettoyage toutes les 5 minutes
+      KAFKA_LOG_RETENTION_CHECK_INTERVAL_MS: 300000
+      
+      # ========== PERFORMANCE ==========
+      # ✅ AMÉLIORATION : Compression par défaut
+      KAFKA_COMPRESSION_TYPE: 'gzip'
+      # ✅ Threads réseau
+      KAFKA_NUM_NETWORK_THREADS: 3
+      # ✅ Threads I/O
+      KAFKA_NUM_IO_THREADS: 8
+      # ✅ Buffer pour les requêtes réseau
+      KAFKA_SOCKET_SEND_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_RECEIVE_BUFFER_BYTES: 102400
+      KAFKA_SOCKET_REQUEST_MAX_BYTES: 104857600
+      
+      # ========== JVM ==========
+      # ✅ Heap size (1GB min et max)
+      KAFKA_HEAP_OPTS: "-Xmx1G -Xms1G"
+      # ✅ Monitoring JMX
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+    
+    # ✅ AMÉLIORATION : Persistance des données
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    
+    # ✅ AMÉLIORATION : Health check
+    healthcheck:
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    # ✅ AMÉLIORATION : Limits (éviter de tuer la machine)
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  # ==========================================================================
+  # ELASTICSEARCH - Indexation (pour Personne 2)
+  # ==========================================================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    # ✅ AMÉLIORATION : Health check
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================================
+  # KIBANA - Visualisation (pour Personne 3)
+  # ==========================================================================
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+    container_name: kibana
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    # ✅ AMÉLIORATION : Health check
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==========================================================================
+  # CASSANDRA - Stockage permanent (pour Personne 3)
+  # ==========================================================================
+  cassandra:
+    image: cassandra:4.1
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    environment:
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 100M
+    volumes:
+      - cassandradata:/var/lib/cassandra
+    # ✅ AMÉLIORATION : Health check
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'describe cluster' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+
+# ==========================================================================
+# VOLUMES - Persistance des données
+# ==========================================================================
+volumes:
+  kafka-data:     # ✅ NOUVEAU : Données Kafka persistées
+    driver: local
+  esdata:
+    driver: local
+  cassandradata:
+    driver: local
+
+# ==========================================================================
+# NOTES D'UTILISATION
+# ==========================================================================
+# 
+# DÉMARRER :
+#   docker-compose -f docker-compose-improved.yml up -d
+#
+# ARRÊTER :
+#   docker-compose -f docker-compose-improved.yml down
+#
+# VOIR LES LOGS :
+#   docker-compose -f docker-compose-improved.yml logs -f kafka
+#
+# SUPPRIMER TOUT (données incluses) :
+#   docker-compose -f docker-compose-improved.yml down -v
+#
+# HEALTH CHECKS :
+#   docker-compose -f docker-compose-improved.yml ps
+#   # Tous les services doivent afficher (healthy)
+#
+# ==========================================================================
