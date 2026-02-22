@@ -120,7 +120,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-
+  # ==========================================================================
+  # ANALYZER (PYTHON APP)
+  # ==========================================================================
+  analyzer:
+    build:
+      context: ./analysis/analyzer
+      dockerfile: Dockerfile
+    container_name: analyzer_improved
+    depends_on:
+      kafka:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: tweets_raw
+      ES_HOST: http://elasticsearch:9200
+      DLQ_TOPIC: tweets_failed
+    restart: unless-stopped
+    volumes:
+      - ./analysis/analyzer:/app
+      - kafka-data:/var/lib/kafka/data
+      - esdata:/usr/share/elasticsearch/data
   # ==========================================================================
   # KIBANA - Visualisation (pour Personne 3)
   # ==========================================================================
