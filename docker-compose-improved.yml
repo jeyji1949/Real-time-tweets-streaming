@@ -218,4 +218,4 @@ volumes:
 #   docker-compose -f docker-compose-improved.yml ps
 #   # Tous les services doivent afficher (healthy)
 #
-# ==========================================================================
+# =========================================================================
