@@ -1,24 +1,20 @@
-# Base Python
+# Utiliser Python slim comme base
 FROM python:3.10-slim
 
-# Variables d'environnement pour éviter les prompts lors de l'installation
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Dépendances système nécessaires
+# Installer des dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Création du dossier de l'application
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier requirements et installer
+# Copier le fichier requirements et installer les dépendances Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copier le script analyzer.py
-COPY analyzer.py .
+# Copier le script amélioré
+COPY analyzer_improved.py .
 
-# Commande par défaut
-CMD ["python", "analyzer.py"]
-
+# Lancer le script au démarrage du conteneur
+CMD ["python", "analyzer_improved.py"]

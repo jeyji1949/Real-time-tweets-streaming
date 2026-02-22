@@ -2,5 +2,5 @@ kafka-python
 elasticsearch==8.11.0
 textblob
 python-dotenv
-
+jsonschema==4.19.0
 
