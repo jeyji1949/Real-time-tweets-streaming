@@ -591,9 +591,9 @@ Ce projet est à usage éducatif dans le cadre du cours de Big Data - BIAM.
 
 ## 🎓 Contexte académique
 
-**Cours** : Big Data - Technologies et Applications  
-**Programme** : BIAM (Business Intelligence & Analytics Management)  
-**Institution** : [Votre université]  
+**Cours** : Big Data 
+**Programme** : BIAM 
+**Institution** : FSDM
 **Année** : 2025-2026  
 **Période** : Février - Mars 2026  
 
