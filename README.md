@@ -714,6 +714,7 @@ EL KHRAIBI Jihane | BENSLIMANE Zineb | Marouane Elbousairi
 
 ⭐ **Star ce repo si utile !** ⭐
 
+📧 Contact : [Votre email de contact]
 
 🔗 GitHub : https://github.com/jeyji1949/Real-time-tweets-streaming
 
