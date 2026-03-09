@@ -7,7 +7,6 @@
 [![Docker](https://img.shields.io/badge/Docker-required-blue.svg)](https://docker.com)
 [![Performance](https://img.shields.io/badge/Performance-5--10x-green.svg)]()
 [![Status](https://img.shields.io/badge/Status-Production--Ready-success.svg)]()
-[![License](https://img.shields.io/badge/License-Educational-blue.svg)]()
 
 > **Pipeline d'analyse de tweets en temps réel** optimisé pour production avec **Kafka**, **Elasticsearch**, **Cassandra** et **Kibana**
 
@@ -35,7 +34,7 @@ graph TB
         SIM[🎭 Simulateur Twitter<br/>Tweets synthétiques réalistes]
     end
     
-    subgraph "INGESTION - Personne 1"
+    subgraph "INGESTION - EL KHRAIBI Jihane"
         PROD[📤 Producer v2.0<br/>✅ acks='all'<br/>✅ Retry x3<br/>✅ Validation<br/>📊 25 msg/s]
     end
     
@@ -44,17 +43,17 @@ graph TB
         DLQ[⚠️ Dead Letter Queue<br/>Topic: tweets_failed<br/>Messages invalides]
     end
     
-    subgraph "PROCESSING - Personne 1 & 2"
+    subgraph "PROCESSING - EL KHRAIBI Jihane & BENSLIMANE Zineb"
         CONS[📥 Consumer v2.0<br/>✅ Batch 10<br/>✅ Commit manuel<br/>📊 50 msg/s]
         ANAL[🧠 Analyzer v2.0<br/>✅ Sentiment Analysis<br/>✅ Topic Detection<br/>✅ Confidence 0-1<br/>📊 50 tweets/s]
     end
     
     subgraph "STORAGE"
-        ES[🔍 Elasticsearch<br/>Index: tweets_index<br/>Recherche temps réel<br/>Retention: 7j ou ∞]
+        ES[🔍 Elasticsearch<br/>Index: tweets_index_improved<br/>Recherche temps réel<br/>Retention: 7j ou ∞]
         CASS[🗄️ Cassandra v2.0<br/>4 tables optimisées<br/>Batch insert<br/>Archivage permanent]
     end
     
-    subgraph "VISUALIZATION - Personne 3"
+    subgraph "VISUALIZATION - Marouane Elbousairi"
         KIB[📊 Kibana<br/>5 Dashboards<br/>Auto-refresh 10s]
         REP[📄 Rapports<br/>Quotidiens<br/>Hebdomadaires PDF]
         EXP[📤 Exports<br/>CSV, Excel<br/>PDF, JSON]
@@ -137,43 +136,6 @@ sequenceDiagram
 
 ## ⚡ Performance V1.0 vs V2.0
 
-```mermaid
-graph TB
-    subgraph "VERSION 1.0 (Original)"
-        V1P[Producer<br/>10.5 msg/s<br/>❌ Pas de retry]
-        V1C[Consumer<br/>5.5 msg/s<br/>❌ Auto commit]
-        V1A[Analyzer<br/>5.5 tweets/s<br/>❌ Insert 1 par 1]
-        V1S[Cassandra<br/>10.5 tweets/s<br/>❌ Pas de batch]
-        
-        V1P -.->|Lent| V1C
-        V1C -.->|Lent| V1A
-        V1A -.->|Lent| V1S
-    end
-    
-    subgraph "VERSION 2.0 (Améliorée)"
-        V2P[Producer v2<br/>25 msg/s<br/>✅ Retry x3<br/>⚡ 2.4x]
-        V2C[Consumer v2<br/>50 msg/s<br/>✅ Batch 10<br/>⚡ 9x]
-        V2A[Analyzer v2<br/>50 tweets/s<br/>✅ Bulk ES<br/>⚡ 9x]
-        V2S[Cassandra v2<br/>50 tweets/s<br/>✅ Batch 50<br/>⚡ 4.75x]
-        
-        V2P ==>|Rapide| V2C
-        V2C ==>|Rapide| V2A
-        V2A ==>|Rapide| V2S
-    end
-    
-    style V1P fill:#FFE5E5,stroke:#FF6B6B,stroke-width:2px
-    style V1C fill:#FFE5E5,stroke:#FF6B6B,stroke-width:2px
-    style V1A fill:#FFE5E5,stroke:#FF6B6B,stroke-width:2px
-    style V1S fill:#FFE5E5,stroke:#FF6B6B,stroke-width:2px
-    
-    style V2P fill:#E5FFE5,stroke:#4ECDC4,stroke-width:3px
-    style V2C fill:#E5FFE5,stroke:#4ECDC4,stroke-width:3px
-    style V2A fill:#E5FFE5,stroke:#95E1D3,stroke-width:3px
-    style V2S fill:#E5FFE5,stroke:#AA96DA,stroke-width:3px
-```
-
-### 📈 Résultats mesurés
-
 | Métrique | V1.0 | V2.0 | Amélioration |
 |----------|------|------|--------------|
 | **Débit global** | 10 tweets/s | 50-100 tweets/s | **5-10x** ⚡ |
@@ -187,7 +149,7 @@ graph TB
 
 ### Prérequis
 
-- Docker & Docker Compose
+- Docker & Docker Compose V2
 - Python 3.8+
 - 6-8 GB RAM disponible
 
@@ -195,7 +157,7 @@ graph TB
 
 ```bash
 # 1. Cloner le repo
-git clone https://github.com/votre-repo/Twitter-Project.git
+git clone https://github.com/jeyji1949/Real-time-tweets-streaming.git
 cd Twitter-Project
 
 # 2. Environnement virtuel
@@ -206,13 +168,13 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Lancer Docker
-docker compose up -d
+docker compose -f docker-compose-improved.yml up -d
 
 # 5. Attendre que tout démarre (60s)
 sleep 60
 
 # 6. Vérifier (tous "healthy")
-docker compose ps
+docker compose -f docker-compose-improved.yml ps
 ```
 
 ### Lancer le pipeline
@@ -226,7 +188,7 @@ python twitter_simulator_improved.py
 
 **Terminal 2 - Analyzer** (déjà dockerisé) :
 ```bash
-docker logs -f analyzer
+docker logs -f analyzer_improved
 ```
 
 **Terminal 3 - Sync Cassandra** (optionnel) :
@@ -242,87 +204,9 @@ python sync_es_to_cassandra_improved.py --mode full
 |---------|-----|-------------|
 | **Kibana** | http://localhost:5601 | Dashboards interactifs |
 | **Elasticsearch** | http://localhost:9200 | API REST |
+| **Cassandra** | localhost:9042 | CQL Shell |
 
 **✅ Félicitations ! Votre pipeline est opérationnel !** 🎉
-
----
-
-## 📊 Dashboards Kibana
-
-### 5 dashboards interactifs créés
-
-```mermaid
-flowchart LR
-    START([👤 Utilisateur])
-    
-    START --> D1[📊 Vue d'ensemble<br/>Metrics, Donut<br/>Timeline, Top hashtags]
-    START --> D2[🤖 Analyse par Topic<br/>Filtre dynamique<br/>Sentiment, Timeline]
-    START --> D3[😊 Analyse Sentiment<br/>Gauge, Heatmap<br/>Confidence]
-    START --> D4[👥 Top Users<br/>Leaderboard<br/>Engagement]
-    START --> D5[📈 Performance<br/>Metrics clés<br/>Scatter plots]
-    
-    style D1 fill:#FCBAD3,stroke:#333,stroke-width:2px
-    style D2 fill:#FCBAD3,stroke:#333,stroke-width:2px
-    style D3 fill:#FCBAD3,stroke:#333,stroke-width:2px
-    style D4 fill:#FCBAD3,stroke:#333,stroke-width:2px
-    style D5 fill:#FCBAD3,stroke:#333,stroke-width:2px
-```
-
-**Guide complet** : [GUIDE_KIBANA_DASHBOARDS.md](docs/GUIDE_KIBANA_DASHBOARDS.md)
-
----
-
-## 🗄️ Schéma de données Cassandra
-
-```mermaid
-erDiagram
-    TWEETS ||--o{ TWEETS_BY_TOPIC : "dénormalisé"
-    TWEETS ||--o{ TWEETS_BY_USER : "dénormalisé"
-    TWEETS ||--o{ TWEETS_BY_SENTIMENT : "dénormalisé"
-    
-    TWEETS {
-        text tweet_id PK
-        text text
-        text user
-        text sentiment
-        float confidence
-        int score
-        text topic
-        list hashtags
-        int retweet_count
-        int like_count
-    }
-    
-    TWEETS_BY_TOPIC {
-        text topic PK
-        timestamp created_at PK
-        text tweet_id PK
-        text sentiment
-        float confidence
-    }
-    
-    TWEETS_BY_USER {
-        text user PK
-        timestamp created_at PK
-        text tweet_id PK
-        text sentiment
-        text topic
-    }
-    
-    TWEETS_BY_SENTIMENT {
-        text sentiment PK
-        timestamp created_at PK
-        text tweet_id PK
-        text user
-        text topic
-    }
-```
-
-**4 tables optimisées** pour requêtes rapides :
-- 🔍 **tweets** : Table principale
-- 🤖 **tweets_by_topic** : Requêtes par sujet
-- 👥 **tweets_by_user** : Requêtes par utilisateur
-- 😊 **tweets_by_sentiment** : Requêtes par sentiment
 
 ---
 
@@ -330,9 +214,9 @@ erDiagram
 
 | Membre | Composants | Performance | Statut |
 |--------|------------|-------------|--------|
-| **Personne 1** | Producer + Consumer v2.0 | 25 msg/s + 50 msg/s | ✅ Terminé |
-| **Personne 2** | Analyzer v2.0 + Elasticsearch | 50 tweets/s | ✅ Terminé |
-| **Personne 3** | Cassandra v2.0 + Kibana + Rapports | 50 tweets/s + 5 dashboards | ✅ Terminé |
+| **EL KHRAIBI Jihane** | Producer + Consumer v2.0 | 25 msg/s + 50 msg/s | ✅ Terminé |
+| **BENSLIMANE Zineb** | Analyzer v2.0 + Elasticsearch | 50 tweets/s | ✅ Terminé |
+| **Marouane Elbousairi** | Cassandra v2.0 + Kibana + Rapports | 50 tweets/s + 5 dashboards | ✅ Terminé |
 
 ---
 
@@ -340,123 +224,168 @@ erDiagram
 
 ```
 Twitter-Project/
-├── producer/                    # Personne 1
-│   ├── twitter_simulator_improved.py    # ✅ v2.0
+├── producer/                         # EL KHRAIBI Jihane
+│   ├── twitter_simulator_improved.py        # ✅ v2.0 (templates négatifs)
+│   ├── twitter_simulator.py                 # v1.0
+│   ├── README.md
+│   └── README_PRODUCER_IMPROVED.md
+│
+├── consumer/                         # EL KHRAIBI Jihane
+│   ├── consumer_improved.py                 # ✅ v2.0
+│   ├── consumer.py                          # v1.0
+│   ├── README.md
+│   └── README_CONSUMER_IMPROVED.md
+│
+├── analysis/                         # BENSLIMANE Zineb
+│   ├── analyzer/
+│   │   ├── analyzer_improved.py             # ✅ v2.0 (avec Cassandra)
+│   │   ├── analyzer.py                      # v1.0
+│   │   ├── cassandra_writer_improved.py     # ✅ v2.0
+│   │   ├── Dockerfile
+│   │   └── requirements.txt
+│   ├── mapping_improved.json                # ✅ v2.0 (avec confidence)
+│   ├── mapping.json                         # v1.0
+│   └── README_IMPROVED.md
+│
+├── storage/                          # Marouane Elbousairi
+│   ├── cassandra_writer_improved.py         # ✅ v2.0
+│   ├── sync_es_to_cassandra_improved.py     # ✅ v2.0
+│   ├── schema_improved.cql                  # ✅ v2.0 (avec confidence)
+│   ├── test_cassandra_improved.py           # ✅ v2.0
+│   ├── cassandra_writer.py                  # v1.0
+│   ├── sync_es_to_cassandra.py              # v1.0
+│   ├── schema.cql                           # v1.0
 │   └── README.md
-├── consumer/                    # Personne 1
-│   ├── consumer_improved.py             # ✅ v2.0
-│   └── README.md
-├── analysis/analyzer/           # Personne 2
-│   ├── analyzer_improved.py             # ✅ v2.0
-│   ├── Dockerfile
-│   └── requirements.txt
-├── storage/                     # Personne 3
-│   ├── cassandra_writer_improved.py     # ✅ v2.0
-│   ├── sync_es_to_cassandra_improved.py # ✅ v2.0
-│   ├── schema_improved.cql              # ✅ v2.0
-│   └── README.md
-├── dashboards/                  # Personne 3
-│   ├── daily_report.py
-│   ├── weekly_report_pdf.py
+│
+├── dashboards/                       # Marouane Elbousairi
+│   ├── kibana_dashboards_complete.ndjson    # ✅ 5 dashboards
 │   ├── export_es_to_csv.py
-│   └── export_to_excel.py
-├── docs/                        # Documentation
-│   ├── GUIDE_KIBANA_DASHBOARDS.md
-│   ├── GUIDE_RAPPORTS_AUTOMATIQUES.md
-│   ├── GUIDE_EXPORTS_CSV_PDF.md
-│   ├── GUIDE_UTILISATEUR_FAQ.md
-│   └── COMPARAISON_COMPLETE.md
-├── docker-compose.yml
-├── requirements.txt
-└── README.md                    # Ce fichier
+│   ├── export_to_excel.py
+│   ├── export_to_json.py
+│   ├── export_to_pdf_detailed.py
+│   ├── weekly_report_pdf.py
+│   ├── exports/                             # Dossier exports CSV/Excel
+│   └── reports/                             # Dossier rapports PDF
+│
+├── docs/                             # Documentation
+│   ├── 01-setup-guide.md
+│   ├── 02-demo.md
+│   ├── 03-troubleshooting.md
+│   ├── 04-architecture.md
+│   ├── 05-handoff-to-person2.md
+│   ├── PRESENTATION_PERSONNE3.md
+│   └── schema.json
+│
+├── data/                             # Données (vide initialement)
+│   └── README.md
+│
+├── venv/                             # Environnement virtuel Python
+│
+├── docker-compose-improved.yml       # ✅ Configuration Docker V2
+├── docker-compose.yml                # Configuration Docker V1
+├── requirements.txt                  # Dépendances Python
+├── README.md                         # Ce fichier
+├── Docker-WorkFlow.md                # Guide Docker
+└── Github-WorkFlow.md                # Guide Git
 ```
 
 ---
 
 ## 🎯 Fonctionnalités
 
-### ✅ Ingestion (Personne 1)
+### ✅ Ingestion (EL KHRAIBI Jihane)
 
-- **Producer v2.0** : Validation JSON, acks='all', retry x3, partitioning
+- **Producer v2.0** : Validation JSON, acks='all', retry x3, partitioning, templates négatifs
 - **Consumer v2.0** : Batch processing, commit manuel, DLQ, monitoring
 - **Performance** : 2.4x (producer) + 9x (consumer)
 
-### ✅ Traitement (Personne 2)
+### ✅ Traitement (BENSLIMANE Zineb)
 
-- **Analyzer v2.0** : Sentiment TextBlob, topic detection, confidence 0-1
-- **Elasticsearch** : Bulk indexing, mapping optimisé
+- **Analyzer v2.0** : Sentiment TextBlob, topic detection, confidence 0-1, intégration Cassandra
+- **Elasticsearch** : Bulk indexing, mapping optimisé avec confidence
 - **Performance** : 9x plus rapide
 
-### ✅ Stockage (Personne 3)
+### ✅ Stockage (Marouane Elbousairi)
 
-- **Cassandra v2.0** : Batch insert, prepared statements, 4 tables
+- **Cassandra v2.0** : Batch insert, prepared statements, 4 tables, champ confidence
 - **Sync ES→Cassandra** : Mode Full + Incremental
 - **Performance** : 4.75x plus rapide
 
-### ✅ Visualisation (Personne 3)
+### ✅ Visualisation (Marouane Elbousairi)
 
 - **5 Dashboards Kibana** : Vue d'ensemble, Topics, Sentiment, Users, Performance
-- **Rapports automatiques** : Quotidiens (TXT), Hebdomadaires (PDF)
+- **Rapports automatiques** : Quotidiens (JSON), Hebdomadaires (PDF)
 - **Exports** : CSV, Excel, PDF, JSON
 
 ---
 
-## 📊 Monitoring & Observabilité
+## 📊 Dashboards Kibana
 
-```mermaid
-graph TB
-    subgraph "PRODUCER MONITORING"
-        PM1[📊 Messages/s<br/>Target: 25/s]
-        PM2[✅ Success Rate<br/>Target: 99.9%]
-        PM3[⚠️ Retry Count<br/>Alert si > 10%]
-    end
-    
-    subgraph "CONSUMER MONITORING"
-        CM1[📊 Throughput<br/>Target: 50/s]
-        CM2[⏱️ Commit Lag<br/>Alert si > 1000]
-        CM3[📦 Batch Size<br/>Avg: 10 msgs]
-    end
-    
-    subgraph "ANALYZER MONITORING"
-        AM1[🧠 Processing Time<br/>Avg: 20ms/tweet]
-        AM2[✅ ES Success<br/>Target: 99%]
-        AM3[⚠️ DLQ Count<br/>Alert si > 5%]
-    end
-    
-    subgraph "STORAGE MONITORING"
-        SM1[🔍 ES Index Size<br/>Monitor growth]
-        SM2[🗄️ Cassandra Count<br/>Total tweets]
-        SM3[⚡ Write Latency<br/>P95 < 100ms]
-    end
-    
-    subgraph "ALERTING"
-        AL1[📧 Email Alerts]
-        AL2[📱 Kibana Alerts]
-        AL3[📊 Dashboard]
-    end
-    
-    PM1 & PM2 & PM3 --> AL3
-    CM1 & CM2 & CM3 --> AL3
-    AM1 & AM2 & AM3 --> AL3
-    SM1 & SM2 & SM3 --> AL3
-    
-    AL3 -.->|Anomaly| AL1
-    AL3 -.->|Threshold| AL2
-    
-    style PM1 fill:#4ECDC4
-    style CM1 fill:#4ECDC4
-    style AM1 fill:#95E1D3
-    style SM1 fill:#AA96DA
-    style AL1 fill:#FF6B6B
-    style AL2 fill:#FFA07A
-    style AL3 fill:#FCBAD3
+### 5 dashboards interactifs créés
+
+1. **📊 Vue d'ensemble** - Metrics, Donut, Timeline, Top hashtags
+2. **🤖 Analyse par Topic** - Filtre dynamique, Sentiment, Timeline
+3. **😊 Analyse Sentiment** - Gauge, Heatmap, Confidence
+4. **👥 Top Users** - Leaderboard, Engagement
+5. **📈 Performance & Engagement** - Metrics clés, Scatter plots
+
+**Import** : `dashboards/kibana_dashboards_complete.ndjson`
+
+**Guide complet** : Voir documentation dans `/docs/`
+
+---
+
+## 🗄️ Schéma de données Cassandra
+
+### 4 tables optimisées
+
+- 🔍 **tweets** : Table principale avec tous les champs (+ confidence)
+- 🤖 **tweets_by_topic** : Requêtes par sujet
+- 👥 **tweets_by_user** : Requêtes par utilisateur
+- 😊 **tweets_by_sentiment** : Requêtes par sentiment
+
+**Schéma** : `storage/schema_improved.cql`
+
+**Nouveautés V2.0** :
+- Champ `confidence` (FLOAT, 0.0 à 1.0)
+- Prepared statements pour performance
+- Batch insert optimisé
+
+---
+
+## 📈 Monitoring & Observabilité
+
+### Stats Producer (toutes les 10s)
+
+```
+✅ Messages envoyés:     150
+❌ Échecs d'envoi:       0
+⚠️  Erreurs validation:  2
+⚡ Débit:                0.50 msg/s
+⏱️  Latence moyenne:      12.34ms
 ```
 
-**Stats toutes les 10 secondes** :
-- Débit (messages/s)
-- Succès/Erreurs
-- Latence moyenne
-- Taille des batches
+### Stats Consumer (toutes les 10s)
+
+```
+📥 Messages reçus:       150
+✅ Messages traités:     150
+❌ Messages échoués:     0
+📦 Batches traités:      15
+⚡ Débit:                2.5 msg/s
+```
+
+### Stats Analyzer (toutes les 10s)
+
+```
+✅ Tweets traités:       1500
+❌ Tweets échoués:       0
+⚠️  Erreurs validation:  5
+📦 Batches traités:      150
+⚡ Débit:                50 tweets/s
+📊 ES indexés:           1500
+🗄️  Cassandra insérés:   1500
+```
 
 ---
 
@@ -466,42 +395,37 @@ graph TB
 
 ```bash
 # 1. Services Docker
-docker compose ps  # Tous "healthy"
+docker compose -f docker-compose-improved.yml ps  # Tous "healthy"
 
 # 2. Kafka
 docker logs kafka | grep "started"
 
 # 3. Elasticsearch
 curl http://localhost:9200/_cluster/health
-curl http://localhost:9200/tweets_index/_count
+curl http://localhost:9200/tweets_index_improved/_count
 
 # 4. Cassandra
 docker exec -it cassandra cqlsh -e \
-  "SELECT COUNT(*) FROM twitter_analytics.tweets;"
+  "USE twitter_analytics; SELECT COUNT(*) FROM tweets;"
 
 # 5. Analyzer
-docker logs -f analyzer
+docker logs -f analyzer_improved
 
 # 6. Producer
 cd producer && python twitter_simulator_improved.py
+
+# 7. Vérifier les sentiments
+curl -s http://localhost:9200/tweets_index_improved/_search -H 'Content-Type: application/json' -d '
+{
+  "aggs": {
+    "sentiments": {
+      "terms": {
+        "field": "sentiment.keyword"
+      }
+    }
+  }
+}' | jq '.aggregations.sentiments.buckets'
 ```
-
----
-
-## 📚 Documentation complète
-
-| Document | Description | Lignes |
-|----------|-------------|--------|
-| [README_PRODUCER_IMPROVED.md](producer/README.md) | Producer v2.0 détaillé | 400 |
-| [README_CONSUMER_IMPROVED.md](consumer/README.md) | Consumer v2.0 détaillé | 450 |
-| [README_CASSANDRA_IMPROVED.md](storage/README.md) | Cassandra v2.0 détaillé | 350 |
-| [GUIDE_KIBANA_DASHBOARDS.md](docs/) | Créer 5 dashboards | 800 |
-| [GUIDE_RAPPORTS_AUTOMATIQUES.md](docs/) | Rapports automatiques | 600 |
-| [GUIDE_EXPORTS_CSV_PDF.md](docs/) | Exports multiples | 700 |
-| [GUIDE_UTILISATEUR_FAQ.md](docs/) | Cas d'usage + FAQ | 500 |
-| [COMPARAISON_COMPLETE.md](docs/) | Avant/Après | 400 |
-
-**Total** : ~4,850 lignes de documentation 📚
 
 ---
 
@@ -510,8 +434,8 @@ cd producer && python twitter_simulator_improved.py
 ### Kafka ne démarre pas
 
 ```bash
-docker compose down -v
-docker compose up -d
+docker compose -f docker-compose-improved.yml down
+docker compose -f docker-compose-improved.yml up -d
 sleep 60
 ```
 
@@ -532,13 +456,35 @@ docker exec -it kafka kafka-console-consumer \
 
 ```bash
 # Vérifier analyzer
-docker logs analyzer | tail -20
+docker logs analyzer_improved | tail -20
 
 # Vérifier count
-curl http://localhost:9200/tweets_index/_count
+curl http://localhost:9200/tweets_index_improved/_count
 ```
 
-**Pour plus de détails** : Voir section Dépannage dans chaque README
+### Kibana ne démarre pas
+
+```bash
+# Vérifier logs
+docker logs kibana
+
+# Redémarrer
+docker compose -f docker-compose-improved.yml restart kibana
+sleep 30
+```
+
+### Pas de tweets négatifs
+
+**Cause** : Templates négatifs manquants dans le producer
+
+**Solution** : Utiliser `twitter_simulator_improved.py` qui contient les templates négatifs
+
+```bash
+cd producer
+python twitter_simulator_improved.py
+```
+
+**Pour plus de détails** : Voir `/docs/03-troubleshooting.md`
 
 ---
 
@@ -564,8 +510,6 @@ curl http://localhost:9200/tweets_index/_count
 - Graphiques intégrés
 - Prêt pour direction
 
-**Guide complet** : [GUIDE_UTILISATEUR_FAQ.md](docs/GUIDE_UTILISATEUR_FAQ.md)
-
 ---
 
 ## 🎯 Résultats finaux
@@ -579,6 +523,7 @@ curl http://localhost:9200/tweets_index/_count
 | **Perte données** | < 1% | ~0% | ✅ Dépassé |
 | **Dashboards** | 3 | 5 | ✅ Dépassé |
 | **Rapports** | 1 | 3 types | ✅ Dépassé |
+| **Sentiments** | 2 types | 3 types (pos/neu/neg) | ✅ Complet |
 
 ### 🏆 Livrables
 
@@ -587,8 +532,9 @@ curl http://localhost:9200/tweets_index/_count
 - ✅ 5 dashboards Kibana interactifs
 - ✅ 3 types de rapports automatiques
 - ✅ 4 formats d'export (CSV, Excel, PDF, JSON)
-- ✅ Documentation complète (10 fichiers)
+- ✅ Documentation complète (10+ fichiers)
 - ✅ Tests validés
+- ✅ Tweets négatifs générés et indexés
 - ✅ Production-ready
 
 ---
@@ -600,6 +546,7 @@ curl http://localhost:9200/tweets_index/_count
 - [Cassandra Documentation](https://cassandra.apache.org/doc/)
 - [Kibana Guide](https://www.elastic.co/guide/en/kibana/)
 - [TextBlob Documentation](https://textblob.readthedocs.io/)
+- [Repository GitHub](https://github.com/jeyji1949/Real-time-tweets-streaming)
 
 ---
 
@@ -607,7 +554,7 @@ curl http://localhost:9200/tweets_index/_count
 
 **Problème non résolu ?**
 
-1. ✅ Consulter [GUIDE_UTILISATEUR_FAQ.md](docs/GUIDE_UTILISATEUR_FAQ.md)
+1. ✅ Consulter `/docs/03-troubleshooting.md`
 2. ✅ Vérifier les logs : `docker logs [service]`
 3. ✅ Lire le README du composant concerné
 4. ✅ Ouvrir une issue GitHub
@@ -616,15 +563,136 @@ curl http://localhost:9200/tweets_index/_count
 
 ## 📄 Licence
 
-Ce projet est à usage éducatif dans le cadre du cours de Big Data.
+Ce projet est à usage éducatif dans le cadre du cours de Big Data - BIAM.
 
 ---
 
 ## 👨‍💻 Contributeurs
 
-- **Personne 1** - Pipeline Kafka optimisé (Producer + Consumer v2.0)
-- **Personne 2** - Analyse optimisée (Analyzer v2.0 + Elasticsearch)
-- **Personne 3** - Visualisation complète (Cassandra v2.0 + Kibana + Rapports)
+### Équipe de développement
+
+- **EL KHRAIBI Jihane** - Pipeline Kafka optimisé (Producer + Consumer v2.0)
+  - ✅ Producer avec acks='all', retry, validation, templates négatifs
+  - ✅ Consumer avec batch processing, commit manuel, DLQ
+  - ✅ Performance : 2.4x (producer) + 9x (consumer)
+
+- **BENSLIMANE Zineb** - Analyse optimisée (Analyzer v2.0 + Elasticsearch)
+  - ✅ Analyzer avec sentiment, topic, confidence, intégration Cassandra
+  - ✅ Elasticsearch avec bulk indexing, mapping optimisé
+  - ✅ Performance : 9x plus rapide
+
+- **Marouane Elbousairi** - Visualisation complète (Cassandra v2.0 + Kibana + Rapports)
+  - ✅ Cassandra avec batch insert, 4 tables, champ confidence
+  - ✅ 5 dashboards Kibana interactifs
+  - ✅ Rapports automatiques et exports multiples
+  - ✅ Performance : 4.75x plus rapide
+
+---
+
+## 🎓 Contexte académique
+
+**Cours** : Big Data - Technologies et Applications  
+**Programme** : BIAM (Business Intelligence & Analytics Management)  
+**Institution** : [Votre université]  
+**Année** : 2025-2026  
+**Période** : Février - Mars 2026  
+
+---
+
+## 📊 Métriques du projet
+
+| Métrique | Valeur |
+|----------|--------|
+| **Lignes de code** | ~5,000 |
+| **Fichiers Python** | 25+ |
+| **Documentation** | 4,850+ lignes |
+| **Commits Git** | 50+ |
+| **Services Docker** | 6 |
+| **Topics Kafka** | 2 (tweets_raw, tweets_failed) |
+| **Tables Cassandra** | 4 |
+| **Dashboards Kibana** | 5 |
+| **Performance globale** | 5-10x amélioration |
+
+---
+
+## 🔄 Workflow de développement
+
+### Git Workflow
+
+```bash
+# Créer une branche feature
+git checkout -b feature/nom-feature
+
+# Travailler sur la feature
+git add .
+git commit -m "feat: Description de la feature"
+
+# Pousser
+git push origin feature/nom-feature
+
+# Merger dans kafka (branche principale)
+git checkout kafka
+git merge feature/nom-feature
+git push origin kafka
+```
+
+### Docker Workflow
+
+```bash
+# Démarrer tout
+docker compose -f docker-compose-improved.yml up -d
+
+# Vérifier
+docker compose -f docker-compose-improved.yml ps
+
+# Voir les logs
+docker compose -f docker-compose-improved.yml logs -f [service]
+
+# Reconstruire un service
+docker compose -f docker-compose-improved.yml build [service]
+docker compose -f docker-compose-improved.yml up -d [service]
+
+# Arrêter (GARDER les données)
+docker compose -f docker-compose-improved.yml down
+
+# Tout nettoyer (SUPPRIMER les données)
+docker compose -f docker-compose-improved.yml down -v
+```
+
+---
+
+## 🚦 Statut des composants
+
+| Composant | Version | Statut | Performance |
+|-----------|---------|--------|-------------|
+| Producer | v2.0 | ✅ Production | 25 msg/s |
+| Consumer | v2.0 | ✅ Production | 50 msg/s |
+| Analyzer | v2.0 | ✅ Production | 50 tweets/s |
+| Cassandra Writer | v2.0 | ✅ Production | 50 tweets/s |
+| ES Sync | v2.0 | ✅ Production | 3x plus rapide |
+| Dashboards Kibana | v1.0 | ✅ Production | 5 dashboards |
+| Rapports | v1.0 | ✅ Production | 3 types |
+| Exports | v1.0 | ✅ Production | 4 formats |
+
+---
+
+## 🔮 Évolutions futures possibles
+
+### Court terme (Sprint 1-2)
+- [ ] Ajouter plus de templates négatifs et neutres
+- [ ] Implémenter des alertes Kibana automatiques
+- [ ] Optimiser les requêtes Cassandra avec index secondaires
+
+### Moyen terme (Sprint 3-4)
+- [ ] Intégrer analyse sentiment avec OpenAI (GPT-4)
+- [ ] Ajouter support multi-langues (FR, ES, AR)
+- [ ] Dashboard de monitoring système (CPU, RAM, Disk)
+
+### Long terme (Production)
+- [ ] Migration vers Kubernetes pour scalabilité
+- [ ] Réplication Cassandra multi-datacenter
+- [ ] Machine Learning pour détection anomalies
+- [ ] API REST pour accès externe aux données
 
 ---
 
@@ -636,6 +704,17 @@ Ce projet est à usage éducatif dans le cadre du cours de Big Data.
 
 **Version** : 2.0 | **Date** : Mars 2026
 
+---
+
+**Développé avec ❤️ par l'équipe BIAM Big Data**
+
+EL KHRAIBI Jihane | BENSLIMANE Zineb | Marouane Elbousairi
+
+---
+
 ⭐ **Star ce repo si utile !** ⭐
+
+
+🔗 GitHub : https://github.com/jeyji1949/Real-time-tweets-streaming
 
 </div>
