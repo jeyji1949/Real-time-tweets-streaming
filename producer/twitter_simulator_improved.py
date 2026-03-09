@@ -157,6 +157,14 @@ TWEET_TEMPLATES = [
     "Finally understand {topic}! Key is to master {skill} basics. #{tag1} #{tag2}",
     "Looking for recommendations on {topic} tools for {skill}. What do you use? #{tag1} #{tag2}",
     "Just deployed my first {topic} application! {skill} makes it so easy. #{tag1} #{tag2}",
+     "Terrible experience with {topic}. Complete waste of time for {skill}. #{tag1} #{tag2}",
+    "This {topic} is awful. Horrible for {skill}. Never using it again. #{tag1} #{tag2}",
+    "Disappointed with {topic}. Doesn't work well for {skill} at all. #{tag1} #{tag2}",
+    "Worst {topic} tutorial ever. Terrible explanations of {skill}. #{tag1} #{tag2}",
+    "I hate {topic}. So frustrating for {skill}. Total disaster. #{tag1} #{tag2}",
+    "Failed miserably with {topic} today. {skill} is impossible. #{tag1} #{tag2}",
+    "{topic} is garbage for {skill}. Buggy and unstable. Avoid it. #{tag1} #{tag2}",
+    "Absolutely horrible {topic} experience. {skill} is a nightmare. #{tag1} #{tag2}",
 ]
 
 TOPICS = [
