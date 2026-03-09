@@ -1,0 +1,20 @@
+{
+  "mappings": {
+    "properties": {
+      "tweet_id": { "type": "keyword" },
+      "text": { "type": "text", "analyzer": "standard" },
+      "user": { "type": "keyword" },
+      "lang": { "type": "keyword" },
+      "hashtags": { "type": "keyword" },
+      "retweet_count": { "type": "integer" },
+      "like_count": { "type": "integer" },
+      "word_freq": { "type": "object" },
+      "sentiment": { "type": "keyword" },
+      "confidence": { "type": "float" },
+      "topic": { "type": "keyword" },
+      "analysis_method": { "type": "keyword" },
+      "created_at": { "type": "date" },
+      "indexed_at": { "type": "date" }
+    }
+  }
+}
