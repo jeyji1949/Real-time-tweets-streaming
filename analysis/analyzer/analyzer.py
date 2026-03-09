@@ -11,6 +11,7 @@ from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from elasticsearch import Elasticsearch
 from textblob import TextBlob
+from analysis.analyzer.cassandra_writer_improved import CassandraWriterImproved
 
 # ==================================================
 # CONFIG

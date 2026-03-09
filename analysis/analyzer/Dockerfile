@@ -17,8 +17,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copier le script analyzer.py
-COPY analyzer.py .
+COPY analyzer_improved.py .
+COPY cassandra_writer_improved.py .
 
 # Commande par défaut
-CMD ["python", "analyzer.py"]
+CMD ["python", "analyzer_improved.py"]
 

@@ -2,5 +2,5 @@ kafka-python
 elasticsearch==8.11.0
 textblob
 python-dotenv
-
-
+cassandra-driver==3.28.0
+jsonschema==4.20.0
